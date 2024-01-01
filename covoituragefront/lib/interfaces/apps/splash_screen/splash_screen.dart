@@ -33,11 +33,11 @@ class _splash_screenState extends State<splash_screen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: 400,
+            width: 350,
             height: 299,
             decoration: ShapeDecoration(
               image: DecorationImage(
-                image: AssetImage('lib/interfaces/images/purple.jpg'),
+                image: AssetImage('lib/interfaces/images/logo2.png'),
                 fit: BoxFit.fill,
               ),
               shape: RoundedRectangleBorder(
@@ -53,10 +53,10 @@ class _splash_screenState extends State<splash_screen> {
             width: 305,
             height: 204,
             child: Text(
-              "Sharing a ride, sharing the journey. \n\nTogether, let's pave the way for a greener, connected tomorrow",
+              "Sharing a ride, sharing the journey ,Connecting Lives. ",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Color.fromARGB(255, 122, 11, 117),
+                color: Colors.black,
                 fontSize: 30,
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w400,

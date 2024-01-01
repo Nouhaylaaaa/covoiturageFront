@@ -1,12 +1,12 @@
 // ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, prefer_const_literals_to_create_immutables, sort_child_properties_last, no_leading_underscores_for_local_identifiers, unused_local_variable, must_be_immutable, unused_field, library_private_types_in_public_api, use_key_in_widget_constructors, prefer_final_fields, unused_element, avoid_print, use_build_context_synchronously, file_names
 
 import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:io';
 import 'package:covoituragefront/interfaces/pages/homepage.dart';
 import 'package:covoituragefront/interfaces/pages/loginPage.dart';
 import 'package:covoituragefront/interfaces/widgets/formWidget.dart';
-import 'package:covoituragefront/interfaces/widgets/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
@@ -19,6 +19,17 @@ class _SignUpState extends State<SignUp> {
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  File? _image;
+  final picker = ImagePicker();
+
+  Future<void> selectImage() async {
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      setState(() {
+        _image = File(pickedImage.path);
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -28,23 +39,45 @@ class _SignUpState extends State<SignUp> {
     super.dispose();
   }
 
-  Uint8List? _image;
-
-  void selectImage() async {
-    Uint8List img = await pickImage(ImageSource.gallery);
-    setState(() {
-      _image = img;
-    });
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
   }
 
   Future<void> registerUser() async {
+    if (_emailController.text.isEmpty ||
+        _usernameController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _image == null) {
+      // Show toast alert for empty fields
+      Fluttertoast.showToast(
+        msg: 'Please fill in all fields',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+    if (!_isValidEmail(_emailController.text)) {
+      // Show toast alert for invalid email format
+      Fluttertoast.showToast(
+        msg: 'Invalid email format',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
     print('Register button pressed');
-    final url = Uri.parse('http://localhost:8080/register');
+    final url = Uri.parse('http://10.0.2.2:8080/register');
     final user = {
-      'username': _usernameController.text,
-      'image': base64Encode(_image!),
       'email': _emailController.text,
+      'image':
+          _image != null ? _image!.path : '', // Convert File to String path
       'password': _passwordController.text,
+      'username': _usernameController.text,
     };
 
     try {
@@ -69,6 +102,7 @@ class _SignUpState extends State<SignUp> {
         print("Error registering: ${response.body}");
       }
     } catch (error) {
+      print('Error: $error');
       // Handle exceptions or network errors
     }
   }
@@ -106,7 +140,7 @@ class _SignUpState extends State<SignUp> {
                 _image != null
                     ? CircleAvatar(
                         radius: 55,
-                        backgroundImage: MemoryImage(_image!),
+                        backgroundImage: FileImage(File(_image!.path)),
                       )
                     : CircleAvatar(
                         radius: 55,

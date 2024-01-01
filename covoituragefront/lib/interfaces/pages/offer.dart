@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace
 
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 class Offer extends StatefulWidget {
@@ -10,6 +12,64 @@ class Offer extends StatefulWidget {
 }
 
 class _OfferState extends State<Offer> {
+  TextEditingController destinationController = TextEditingController();
+  TextEditingController startingPointController = TextEditingController();
+  TextEditingController dateDepartureController = TextEditingController();
+  TextEditingController numberOfPassengersController = TextEditingController();
+  Future<void> postOffer() async {
+    final url = Uri.parse('http://10.0.2.2:8080/offers/addOffer');
+    final offer = {
+      'destination': destinationController.text,
+      'startingPoint': startingPointController.text,
+      'dateDeparture': dateDepartureController.text,
+      'numberOfPassengers': numberOfPassengersController.text,
+    };
+
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(offer),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        resetFields(); // Reset input fields
+        showSuccessDialog();
+      } else {
+        // Handle error cases
+      }
+    } catch (error) {
+      // Handle exceptions or network errors
+    }
+  }
+
+  void resetFields() {
+    destinationController.clear();
+    startingPointController.clear();
+    dateDepartureController.clear();
+    numberOfPassengersController.clear();
+  }
+
+  void showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Success!'),
+          content: Text('You\'ve got a new offer.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,12 +118,12 @@ class _OfferState extends State<Offer> {
               ),
               Expanded(
                   child: TextField(
+                controller: destinationController,
                 decoration: InputDecoration(
                   hintText: 'Enter destination', // Placeholder text
                   border: InputBorder.none, // Remove input field border
                   contentPadding: EdgeInsets.symmetric(vertical: 14),
                 ),
-                onChanged: (value) {},
               ))
             ],
           ),
@@ -92,12 +152,12 @@ class _OfferState extends State<Offer> {
               ),
               Expanded(
                   child: TextField(
+                controller: startingPointController,
                 decoration: InputDecoration(
                   hintText: 'Start point', // Placeholder text
                   border: InputBorder.none, // Remove input field border
                   contentPadding: EdgeInsets.symmetric(vertical: 14),
                 ),
-                onChanged: (value) {},
               ))
             ],
           ),
@@ -126,14 +186,12 @@ class _OfferState extends State<Offer> {
               ),
               Expanded(
                   child: TextField(
+                controller: dateDepartureController,
                 decoration: InputDecoration(
                   hintText: 'DD/MM/YYYY D-Departure', // Placeholder text
                   border: InputBorder.none, // Remove input field border
                   contentPadding: EdgeInsets.symmetric(vertical: 14),
                 ),
-                onChanged: (value) {
-                  // Handle entered date value
-                },
               ))
             ],
           ),
@@ -162,14 +220,12 @@ class _OfferState extends State<Offer> {
               ),
               Expanded(
                   child: TextField(
+                controller: numberOfPassengersController,
                 decoration: InputDecoration(
                   hintText: 'Passangers number', // Placeholder text
                   border: InputBorder.none, // Remove input field border
                   contentPadding: EdgeInsets.symmetric(vertical: 14),
                 ),
-                onChanged: (value) {
-                  // Handle entered date value
-                },
               ))
             ],
           ),
@@ -178,7 +234,7 @@ class _OfferState extends State<Offer> {
           height: 20,
         ),
         ElevatedButton(
-            onPressed: () {},
+            onPressed: postOffer,
             style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),

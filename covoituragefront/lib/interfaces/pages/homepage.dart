@@ -1,9 +1,11 @@
-// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, use_build_context_synchronously, avoid_print
 
 import 'package:covoituragefront/interfaces/pages/Profile.dart';
+import 'package:covoituragefront/interfaces/pages/loginPage.dart';
 import 'package:covoituragefront/interfaces/pages/offer.dart';
-import 'package:covoituragefront/interfaces/pages/signupPage.dart';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,6 +14,33 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Future<void> logoutUser() async {
+    final logoutUrl = Uri.parse('http://10.0.2.2:8080/logout');
+
+    try {
+      final response = await http.delete(
+        logoutUrl,
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Logout successful, navigate to login page or perform necessary actions
+        // For example, navigate back to the login page
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+          (Route<dynamic> route) => false, // Remove all previous routes
+        );
+      } else {
+        // Handle other status codes or errors during logout
+        print('Logout failed: ${response.statusCode}');
+      }
+    } catch (error) {
+      // Handle exceptions or network errors during logout
+      print('Error: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,13 +100,7 @@ class _HomePageState extends State<HomePage> {
               width: 100,
             ),
             GestureDetector(
-              onTap: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => SignUp()),
-                  (route) => false,
-                );
-              },
+              onTap: logoutUser,
               child: Container(
                 width: 100,
                 height: 50,

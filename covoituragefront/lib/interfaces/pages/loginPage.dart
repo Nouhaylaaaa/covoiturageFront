@@ -1,10 +1,9 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, unused_element, prefer_final_fields, use_build_context_synchronously, avoid_print, file_names
-
-import 'dart:convert';
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, unused_element, prefer_final_fields, use_build_context_synchronously, avoid_print, file_names, unnecessary_null_comparison
 
 import 'package:covoituragefront/interfaces/pages/homepage.dart';
 import 'package:covoituragefront/interfaces/pages/signupPage.dart';
 import 'package:covoituragefront/interfaces/widgets/formWidget.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
@@ -29,30 +28,59 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> loginUser() async {
-    final url = Uri.parse('http://localhost:8080/login');
-    final userCredentials = {
-      'email': _emailController.text,
-      'password': _passwordController.text,
-    };
+    final Uri url =
+        Uri.parse('http://10.0.2.2:8080/login?email=${_emailController.text}');
 
     try {
-      final response = await http.post(
-        url,
-        body: json.encode(userCredentials),
-        headers: {'Content-Type': 'application/json'},
-      );
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        // Login successful, navigate to home page or desired screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+        // Check if the response body is not empty
+        if (response.body != null && response.body.isNotEmpty) {
+          // Login successful, navigate to home page
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+        } else {
+          // Handle empty response body or unexpected data
+          Fluttertoast.showToast(
+            msg: 'Unexpected response. Please try again.',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+          );
+        }
+      } else if (response.statusCode == 404) {
+        // User not found, show message to register first
+        Fluttertoast.showToast(
+          msg: 'User not found. Please register first.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
         );
       } else {
-        // Handle login failure, show error message or perform other actions
+        // Invalid credentials or other issues, show appropriate message
+        Fluttertoast.showToast(
+          msg: 'Invalid credentials. Please try again.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
       }
     } catch (error) {
       // Handle exceptions or network errors
+      print('Error: $error');
+      Fluttertoast.showToast(
+        msg: 'Error occurred. Please try again.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
     }
   }
 
@@ -97,6 +125,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             Center(
               child: FormContainerWidget(
+                controller: _emailController,
                 hintText: "Email",
                 isPasswordField: false,
               ),
