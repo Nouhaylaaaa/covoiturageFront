@@ -1,12 +1,10 @@
 // ignore_for_file: prefer_const_constructors, unused_field, sort_child_properties_last, prefer_const_literals_to_create_immutables, avoid_print, file_names
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -16,18 +14,6 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  File? _image;
-  final picker = ImagePicker();
-
-  Future<void> selectImage() async {
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      setState(() {
-        _image = File(pickedImage.path);
-      });
-    }
-  }
-
   Future<String> getUserData() async {
     final response = await http.get(Uri.parse('http://10.0.2.2:8080/userName'));
     if (response.statusCode == 200) {
@@ -93,27 +79,25 @@ class _ProfileState extends State<Profile> {
                 } else if (snapshot.hasError) {
                   return Text('Error loading image: ${snapshot.error}');
                 } else {
-                  ImageProvider imageProvider;
-                  if (snapshot.data != null) {
-                    final imageData = snapshot.data!;
-                    if (imageData.isNotEmpty) {
-                      imageProvider = MemoryImage(base64Decode(imageData));
-                    } else {
-                      imageProvider =
-                          AssetImage('lib/interfaces/images/user.png');
-                    }
-                  } else {
-                    imageProvider =
-                        AssetImage('lib/interfaces/images/user.png');
-                  }
+                  String? imageUrl = snapshot.data;
 
-                  if (mounted) {
+                  if (imageUrl != null && imageUrl.isNotEmpty) {
                     return CircleAvatar(
                       radius: 50,
-                      backgroundImage: imageProvider,
+                      backgroundImage: FileImage(File(imageUrl)),
                     );
                   } else {
-                    return const SizedBox(); // Return an empty widget if unmounted
+                    return CircleAvatar(
+                      radius: 50,
+                      child: Image.asset(
+                        'lib/interfaces/images/user.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (BuildContext context, Object exception,
+                            StackTrace? stackTrace) {
+                          return const Text('Failed to load image');
+                        },
+                      ),
+                    );
                   }
                 }
               },

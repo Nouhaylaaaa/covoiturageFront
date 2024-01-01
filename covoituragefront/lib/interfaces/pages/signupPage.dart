@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, prefer_const_literals_to_create_immutables, sort_child_properties_last, no_leading_underscores_for_local_identifiers, unused_local_variable, must_be_immutable, unused_field, library_private_types_in_public_api, use_key_in_widget_constructors, prefer_final_fields, unused_element, avoid_print, use_build_context_synchronously, file_names
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, prefer_const_literals_to_create_immutables, sort_child_properties_last, no_leading_underscores_for_local_identifiers, unused_local_variable, must_be_immutable, unused_field, library_private_types_in_public_api, use_key_in_widget_constructors, prefer_final_fields, unused_element, avoid_print, use_build_context_synchronously, file_names, prefer_const_declarations, depend_on_referenced_packages
 
 import 'dart:convert';
 import 'dart:io';
@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 
 class SignUp extends StatefulWidget {
   @override
@@ -25,8 +26,16 @@ class _SignUpState extends State<SignUp> {
   Future<void> selectImage() async {
     final pickedImage = await picker.pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
+      final imageName =
+          path.basename(pickedImage.path); // Extracts just the image name
+      final String emulatorPath = '/storage/emulated/0/Download';
+      final String imagePath = '$emulatorPath/$imageName';
+
+      final File newImage = File(pickedImage.path);
+      final File copiedImage = await newImage.copy(imagePath);
+
       setState(() {
-        _image = File(pickedImage.path);
+        _image = copiedImage;
       });
     }
   }
