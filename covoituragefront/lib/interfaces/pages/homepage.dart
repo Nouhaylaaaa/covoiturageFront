@@ -1,6 +1,7 @@
-// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, use_build_context_synchronously, avoid_print
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, use_build_context_synchronously, avoid_print, deprecated_member_use, prefer_const_literals_to_create_immutables
 
 import 'package:covoituragefront/interfaces/pages/Profile.dart';
+import 'package:covoituragefront/interfaces/pages/SearchPage.dart';
 import 'package:covoituragefront/interfaces/pages/loginPage.dart';
 import 'package:covoituragefront/interfaces/pages/offer.dart';
 
@@ -14,6 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  TextEditingController destinationController = TextEditingController();
   Future<void> logoutUser() async {
     final logoutUrl = Uri.parse('http://10.0.2.2:8080/logout');
 
@@ -139,6 +141,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Center(
                     child: TextField(
+                      controller: destinationController,
                       decoration: InputDecoration(
                         hintText: 'Enter Destination',
                         hintStyle: TextStyle(
@@ -159,34 +162,41 @@ class _HomePageState extends State<HomePage> {
                     ),
                   )),
               SizedBox(
-                width: 10,
+                width: 5,
               ),
-              Stack(children: [
-                Container(
-                  width: 45,
-                  height: 50,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 1, color: Color(0xFF471AA0)),
-                      borderRadius: BorderRadius.circular(15),
+              ElevatedButton.icon(
+                onPressed: () {
+                  String enteredDestination = destinationController.text;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          SearchPage(destination: enteredDestination),
                     ),
-                  ),
-                ),
-                Positioned(
-                    child: Container(
-                  width: 40,
-                  height: 45,
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(
+                  );
+                },
+                icon: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
                       Icons.search,
                       size: 30,
                       color: Colors.black,
                     ),
+                  ],
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.white,
+                  side: BorderSide(width: 1, color: Color(0xFF471AA0)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                )),
-              ]),
+                ),
+                label: Container(
+                  width: 0,
+                  height: 45,
+                ),
+              )
             ],
           ),
           SizedBox(
