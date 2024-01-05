@@ -1,8 +1,9 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, unused_local_variable, unused_element, use_build_context_synchronously
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // For DateFormat
 
 class Offer extends StatefulWidget {
   const Offer({super.key});
@@ -16,6 +17,8 @@ class _OfferState extends State<Offer> {
   TextEditingController startingPointController = TextEditingController();
   TextEditingController dateDepartureController = TextEditingController();
   TextEditingController numberOfPassengersController = TextEditingController();
+  TextEditingController vehiculeController = TextEditingController();
+
   Future<void> postOffer() async {
     final url = Uri.parse('http://10.0.2.2:8080/offers/addOffer');
     final offer = {
@@ -23,6 +26,7 @@ class _OfferState extends State<Offer> {
       'startingPoint': startingPointController.text,
       'dateDeparture': dateDepartureController.text,
       'numberOfPassengers': numberOfPassengersController.text,
+      'vehicule': vehiculeController.text,
     };
 
     try {
@@ -33,7 +37,8 @@ class _OfferState extends State<Offer> {
       );
 
       if (response.statusCode == 200) {
-        resetFields(); // Reset input fields
+        Navigator.pop(context, true);
+        resetFields();
         showSuccessDialog();
       } else {
         // Handle error cases
@@ -48,6 +53,7 @@ class _OfferState extends State<Offer> {
     startingPointController.clear();
     dateDepartureController.clear();
     numberOfPassengersController.clear();
+    vehiculeController.clear();
   }
 
   void showSuccessDialog() {
@@ -68,6 +74,23 @@ class _OfferState extends State<Offer> {
         );
       },
     );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(), // Initial date when calendar opens
+      firstDate: DateTime(2000), // The earliest selectable date
+      lastDate: DateTime(2101), // The latest selectable date
+    );
+    if (picked != null) {
+      setState(() {
+        DateTime? selectedDate;
+        selectedDate = picked; // Update selected date if a new one is picked
+        dateDepartureController.text = DateFormat('dd/MM/yyyy')
+            .format(picked); // Set the text in the text field
+      });
+    }
   }
 
   @override
@@ -191,6 +214,13 @@ class _OfferState extends State<Offer> {
                   hintText: 'DD/MM/YYYY D-Departure', // Placeholder text
                   border: InputBorder.none, // Remove input field border
                   contentPadding: EdgeInsets.symmetric(vertical: 14),
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.calendar_today),
+                    onPressed: () {
+                      _selectDate(
+                          context); // Open the date picker when the calendar icon is tapped
+                    },
+                  ),
                 ),
               ))
             ],
@@ -231,30 +261,66 @@ class _OfferState extends State<Offer> {
           ),
         ),
         SizedBox(
-          height: 20,
+          height: 10,
         ),
-        ElevatedButton(
-            onPressed: postOffer,
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              backgroundColor: Color(0xFF471AA0),
+        Container(
+          width: 320,
+          height: 50,
+          decoration: ShapeDecoration(
+            shape: RoundedRectangleBorder(
+              side: BorderSide(width: 2, color: Color(0xFF9747FF)),
+              borderRadius: BorderRadius.circular(15),
             ),
-            child: SizedBox(
-              width: 140,
-              height: 50,
-              child: Center(
-                child: Text(
-                  'Post',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+          ),
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.directions_car,
+                  color: Colors.black,
+                  size: 30,
                 ),
               ),
-            ))
+              Expanded(
+                  child: TextField(
+                controller: vehiculeController,
+                decoration: InputDecoration(
+                  hintText: 'Vehicule', // Placeholder text
+                  border: InputBorder.none, // Remove input field border
+                  contentPadding: EdgeInsets.symmetric(vertical: 14),
+                ),
+              ))
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Flexible(
+          child: ElevatedButton(
+              onPressed: postOffer,
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                backgroundColor: Color(0xFF471AA0),
+              ),
+              child: SizedBox(
+                width: 140,
+                height: 50,
+                child: Center(
+                  child: Text(
+                    'Post',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              )),
+        )
       ],
     ));
   }

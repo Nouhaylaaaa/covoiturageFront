@@ -1,30 +1,26 @@
-// ignore_for_file: prefer_const_constructors, sort_child_properties_last, deprecated_member_use, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors_in_immutables, file_names, avoid_print
+// ignore_for_file: prefer_const_constructors, sort_child_properties_last, deprecated_member_use, use_key_in_widget_constructors, library_private_types_in_public_api, avoid_print, file_names
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class OfferScreen extends StatefulWidget {
-  final String destination;
-
-  OfferScreen({required this.destination});
-
+class GetOffers extends StatefulWidget {
   @override
-  _OfferScreenState createState() => _OfferScreenState();
+  _GetOffersState createState() => _GetOffersState();
 }
 
-class _OfferScreenState extends State<OfferScreen> {
+class _GetOffersState extends State<GetOffers> {
   List<dynamic> offers = [];
 
   @override
   void initState() {
     super.initState();
-    fetchOffers();
+    fetchAllOffers();
   }
 
-  Future<void> fetchOffers() async {
-    final response = await http.get(Uri.parse(
-        'http://10.0.2.2:8080/offers/offersByDestination?destination=${widget.destination}'));
+  Future<void> fetchAllOffers() async {
+    final response =
+        await http.get(Uri.parse('http://10.0.2.2:8080/offers/getOffer'));
 
     if (response.statusCode == 200) {
       setState(() {
@@ -37,17 +33,38 @@ class _OfferScreenState extends State<OfferScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Listen for a signal from the Offer page to refresh data
+    _refreshOffersOnReturn(context);
+  }
+
+  void _refreshOffersOnReturn(BuildContext context) {
+    // Listen for a signal sent from the Offer page to refresh data
+    final didCreateOffer = ModalRoute.of(context)?.settings.arguments as bool?;
+    if (didCreateOffer != null && didCreateOffer) {
+      // If a new offer was created, refresh the list of offers
+      fetchAllOffers();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return offers.isEmpty
-        ? Center(child: CircularProgressIndicator())
-        : Expanded(
-            child: ListView.builder(
-              itemCount: offers.length,
-              itemBuilder: (BuildContext context, int index) {
-                return buildSingleOfferContainer(offers[index]);
+    return Scaffold(
+      body: offers.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: () async {
+                await fetchAllOffers(); // Refresh offers on pull down
               },
+              child: ListView.builder(
+                itemCount: offers.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return buildSingleOfferContainer(offers[index]);
+                },
+              ),
             ),
-          );
+    );
   }
 
   Widget buildSingleOfferContainer(dynamic offer) {

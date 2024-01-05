@@ -1,9 +1,10 @@
 // ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, use_build_context_synchronously, avoid_print, deprecated_member_use, prefer_const_literals_to_create_immutables
 
-import 'package:covoituragefront/interfaces/pages/Profile.dart';
 import 'package:covoituragefront/interfaces/pages/SearchPage.dart';
 import 'package:covoituragefront/interfaces/pages/loginPage.dart';
-import 'package:covoituragefront/interfaces/pages/offer.dart';
+
+import 'package:covoituragefront/interfaces/pages/sidebarHomePage.dart';
+import 'package:covoituragefront/interfaces/widgets/getAllOffers.dart';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -43,195 +44,145 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  bool _shouldRefreshOffers = false;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _refreshOffersOnReturn();
+  }
+
+  void _refreshOffersOnReturn() {
+    final routeArgs = ModalRoute.of(context)?.settings.arguments;
+    if (routeArgs != null && routeArgs is bool && routeArgs) {
+      // If a new offer was added, refresh the list of offers
+      setState(() {
+        _shouldRefreshOffers = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Flexible(
-            child: Container(
-              width: 400,
-              height: 150,
-              decoration: ShapeDecoration(
-                image: DecorationImage(
-                  image: AssetImage('lib/interfaces/images/purple.jpg'),
-                  fit: BoxFit.fill,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Profile()),
-                );
-              },
-              child: Container(
-                width: 100,
-                height: 50,
-                decoration: ShapeDecoration(
-                  color: Color(0xFF471AA0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    'Profile',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 100,
-            ),
-            GestureDetector(
-              onTap: logoutUser,
-              child: Container(
-                width: 100,
-                height: 50,
-                decoration: ShapeDecoration(
-                  color: Color(0xFF471AA0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    'Log Out',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            )
-          ]),
-          SizedBox(
-            height: 40,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+      appBar: PreferredSize(
+          preferredSize: Size.fromHeight(40), // Adjust the height as needed
+          child: AppBar(
+            backgroundColor: Color(0xFF471AA0),
+          )),
+      drawer: SidBarHomePage(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
-                  width: 250,
-                  height: 50,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 2, color: Color(0xFF9747FF)),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                  child: Center(
-                    child: TextField(
-                      controller: destinationController,
-                      decoration: InputDecoration(
-                        hintText: 'Enter Destination',
-                        hintStyle: TextStyle(
-                          color: Colors.black.withOpacity(0.3),
-                          fontSize: 15,
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                        ),
-                        border: InputBorder.none,
-                      ),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black, // Change text color when typing
-                        fontSize: 15,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  )),
               SizedBox(
-                width: 5,
+                height: 10,
               ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  String enteredDestination = destinationController.text;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          SearchPage(destination: enteredDestination),
-                    ),
-                  );
-                },
-                icon: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.search,
-                      size: 30,
-                      color: Colors.black,
-                    ),
-                  ],
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.white,
-                  side: BorderSide(width: 1, color: Color(0xFF471AA0)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                      width: 250,
+                      height: 50,
+                      decoration: ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(width: 2, color: Color(0xFF9747FF)),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      child: Center(
+                        child: TextField(
+                          controller: destinationController,
+                          decoration: InputDecoration(
+                            hintText: 'Enter Destination',
+                            hintStyle: TextStyle(
+                              color: Colors.black.withOpacity(0.3),
+                              fontSize: 15,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                            ),
+                            border: InputBorder.none,
+                          ),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color:
+                                Colors.black, // Change text color when typing
+                            fontSize: 15,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      )),
+                  SizedBox(
+                    width: 5,
                   ),
-                ),
-                label: Container(
-                  width: 0,
-                  height: 45,
-                ),
-              )
-            ],
-          ),
-          SizedBox(
-            height: 50,
-          ),
-          Center(
-              child: SizedBox(
-                  width: 310,
-                  height: 60,
-                  child: ElevatedButton(
+                  ElevatedButton.icon(
                     onPressed: () {
+                      String enteredDestination = destinationController.text;
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Offer()),
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              SearchPage(destination: enteredDestination),
+                        ),
                       );
                     },
+                    icon: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search,
+                          size: 30,
+                          color: Colors.black,
+                        ),
+                      ],
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF9747FF),
+                      primary: Colors.white,
+                      side: BorderSide(width: 1, color: Color(0xFF471AA0)),
                       shape: RoundedRectangleBorder(
-                        side: BorderSide(width: 2, color: Color(0xFF471AA0)),
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                    child: Text(
-                      'Click if you want to suggest a traject',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w800,
-                      ),
+                    label: Container(
+                      width: 0,
+                      height: 45,
                     ),
-                  )))
-        ],
+                  )
+                ],
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              SizedBox(
+                height: 400,
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    setState(() {
+                      // Trigger the refresh manually
+                      _shouldRefreshOffers = true;
+                    });
+                  },
+                  child: _shouldRefreshOffers
+                      ? GetOffers()
+                      : FutureBuilder(
+                          future: Future.delayed(Duration(seconds: 1)),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              setState(() {
+                                _shouldRefreshOffers = true;
+                              });
+                            }
+                            return GetOffers();
+                          },
+                        ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

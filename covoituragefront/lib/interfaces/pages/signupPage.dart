@@ -103,9 +103,10 @@ class _SignUpState extends State<SignUp> {
         print('Registration successful');
         print(
             'Response body: ${response.body}'); // Print the response body for details
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => HomePage()),
+          (route) => false,
         );
       } else {
         print("Error registering: ${response.body}");

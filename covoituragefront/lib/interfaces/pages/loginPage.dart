@@ -28,8 +28,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> loginUser() async {
-    final Uri url =
-        Uri.parse('http://10.0.2.2:8080/login?email=${_emailController.text}');
+    final Uri url = Uri.parse(
+        'http://10.0.2.2:8080/login?email=${_emailController.text}&password=${_passwordController.text}');
 
     try {
       final response = await http.get(url);
@@ -38,9 +38,10 @@ class _LoginPageState extends State<LoginPage> {
         // Check if the response body is not empty
         if (response.body != null && response.body.isNotEmpty) {
           // Login successful, navigate to home page
-          Navigator.push(
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => HomePage()),
+            (route) => false,
           );
         } else {
           // Handle empty response body or unexpected data
@@ -135,6 +136,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             Center(
               child: FormContainerWidget(
+                controller: _passwordController,
                 hintText: "Password",
                 isPasswordField: true,
               ),
