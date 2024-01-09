@@ -54,7 +54,6 @@ class _HomePageState extends State<HomePage> {
   void _refreshOffersOnReturn() {
     final routeArgs = ModalRoute.of(context)?.settings.arguments;
     if (routeArgs != null && routeArgs is bool && routeArgs) {
-      // If a new offer was added, refresh the list of offers
       setState(() {
         _shouldRefreshOffers = true;
       });
@@ -164,20 +163,7 @@ class _HomePageState extends State<HomePage> {
                       _shouldRefreshOffers = true;
                     });
                   },
-                  child: _shouldRefreshOffers
-                      ? GetOffers()
-                      : FutureBuilder(
-                          future: Future.delayed(Duration(seconds: 1)),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              setState(() {
-                                _shouldRefreshOffers = true;
-                              });
-                            }
-                            return GetOffers();
-                          },
-                        ),
+                  child: GetOffers(shouldRefresh: _shouldRefreshOffers),
                 ),
               ),
             ],

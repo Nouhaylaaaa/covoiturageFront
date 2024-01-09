@@ -1,10 +1,14 @@
 // ignore_for_file: prefer_const_constructors, sort_child_properties_last, deprecated_member_use, use_key_in_widget_constructors, library_private_types_in_public_api, avoid_print, file_names
 
+import 'package:covoituragefront/interfaces/pages/checkOfferPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class GetOffers extends StatefulWidget {
+  final bool shouldRefresh;
+
+  const GetOffers({Key? key, required this.shouldRefresh}) : super(key: key);
   @override
   _GetOffersState createState() => _GetOffersState();
 }
@@ -33,17 +37,9 @@ class _GetOffersState extends State<GetOffers> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Listen for a signal from the Offer page to refresh data
-    _refreshOffersOnReturn(context);
-  }
-
-  void _refreshOffersOnReturn(BuildContext context) {
-    // Listen for a signal sent from the Offer page to refresh data
-    final didCreateOffer = ModalRoute.of(context)?.settings.arguments as bool?;
-    if (didCreateOffer != null && didCreateOffer) {
-      // If a new offer was created, refresh the list of offers
+  void didUpdateWidget(covariant GetOffers oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.shouldRefresh) {
       fetchAllOffers();
     }
   }
@@ -90,7 +86,12 @@ class _GetOffersState extends State<GetOffers> {
           ),
           ElevatedButton(
             onPressed: () {
-              // Add functionality for the 'Check' button here
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CheckOffer(offer: offer),
+                ),
+              );
             },
             child: Text(
               'Check',

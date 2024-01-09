@@ -178,6 +178,16 @@ class _SidBarHomePageState extends State<SidBarHomePage> {
             },
           ),
           ListTile(
+            leading: Icon(Icons.chat), // Plus icon for posting an offer
+            title: Text('chat'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Offer()),
+              );
+            },
+          ),
+          ListTile(
             leading: Icon(Icons.logout), // Logout icon
             title: Text('Logout'),
             onTap: logoutUser,

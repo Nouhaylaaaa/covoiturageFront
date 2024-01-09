@@ -18,6 +18,7 @@ class _OfferState extends State<Offer> {
   TextEditingController dateDepartureController = TextEditingController();
   TextEditingController numberOfPassengersController = TextEditingController();
   TextEditingController vehiculeController = TextEditingController();
+  TextEditingController priceController = TextEditingController();
 
   Future<void> postOffer() async {
     final url = Uri.parse('http://10.0.2.2:8080/offers/addOffer');
@@ -27,6 +28,7 @@ class _OfferState extends State<Offer> {
       'dateDeparture': dateDepartureController.text,
       'numberOfPassengers': numberOfPassengersController.text,
       'vehicule': vehiculeController.text,
+      'price': priceController.text
     };
 
     try {
@@ -54,6 +56,7 @@ class _OfferState extends State<Offer> {
     dateDepartureController.clear();
     numberOfPassengersController.clear();
     vehiculeController.clear();
+    priceController.clear();
   }
 
   void showSuccessDialog() {
@@ -102,7 +105,7 @@ class _OfferState extends State<Offer> {
         Flexible(
           child: Container(
             width: 380,
-            height: 150,
+            height: 100,
             decoration: ShapeDecoration(
               image: DecorationImage(
                 image: AssetImage('lib/interfaces/images/purple.jpg'),
@@ -118,11 +121,11 @@ class _OfferState extends State<Offer> {
           ),
         ),
         SizedBox(
-          height: 10,
+          height: 15,
         ),
         Container(
-          width: 320,
-          height: 50,
+          width: 300,
+          height: 45,
           decoration: ShapeDecoration(
             shape: RoundedRectangleBorder(
               side: BorderSide(width: 2, color: Color(0xFF9747FF)),
@@ -136,7 +139,7 @@ class _OfferState extends State<Offer> {
                 child: Icon(
                   Icons.location_city,
                   color: Colors.black,
-                  size: 30,
+                  size: 25,
                 ),
               ),
               Expanded(
@@ -155,8 +158,8 @@ class _OfferState extends State<Offer> {
           height: 10,
         ),
         Container(
-          width: 320,
-          height: 50,
+          width: 300,
+          height: 40,
           decoration: ShapeDecoration(
             shape: RoundedRectangleBorder(
               side: BorderSide(width: 2, color: Color(0xFF9747FF)),
@@ -170,7 +173,7 @@ class _OfferState extends State<Offer> {
                 child: Icon(
                   Icons.location_on,
                   color: Colors.black,
-                  size: 30,
+                  size: 25,
                 ),
               ),
               Expanded(
@@ -189,8 +192,8 @@ class _OfferState extends State<Offer> {
           height: 10,
         ),
         Container(
-          width: 320,
-          height: 50,
+          width: 300,
+          height: 40,
           decoration: ShapeDecoration(
             shape: RoundedRectangleBorder(
               side: BorderSide(width: 2, color: Color(0xFF9747FF)),
@@ -204,7 +207,7 @@ class _OfferState extends State<Offer> {
                 child: Icon(
                   Icons.date_range,
                   color: Colors.black,
-                  size: 30,
+                  size: 25,
                 ),
               ),
               Expanded(
@@ -230,8 +233,8 @@ class _OfferState extends State<Offer> {
           height: 10,
         ),
         Container(
-          width: 320,
-          height: 50,
+          width: 300,
+          height: 40,
           decoration: ShapeDecoration(
             shape: RoundedRectangleBorder(
               side: BorderSide(width: 2, color: Color(0xFF9747FF)),
@@ -245,7 +248,7 @@ class _OfferState extends State<Offer> {
                 child: Icon(
                   Icons.group,
                   color: Colors.black,
-                  size: 30,
+                  size: 25,
                 ),
               ),
               Expanded(
@@ -264,8 +267,8 @@ class _OfferState extends State<Offer> {
           height: 10,
         ),
         Container(
-          width: 320,
-          height: 50,
+          width: 300,
+          height: 40,
           decoration: ShapeDecoration(
             shape: RoundedRectangleBorder(
               side: BorderSide(width: 2, color: Color(0xFF9747FF)),
@@ -279,7 +282,7 @@ class _OfferState extends State<Offer> {
                 child: Icon(
                   Icons.directions_car,
                   color: Colors.black,
-                  size: 30,
+                  size: 25,
                 ),
               ),
               Expanded(
@@ -287,6 +290,40 @@ class _OfferState extends State<Offer> {
                 controller: vehiculeController,
                 decoration: InputDecoration(
                   hintText: 'Vehicule', // Placeholder text
+                  border: InputBorder.none, // Remove input field border
+                  contentPadding: EdgeInsets.symmetric(vertical: 14),
+                ),
+              ))
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+          width: 300,
+          height: 40,
+          decoration: ShapeDecoration(
+            shape: RoundedRectangleBorder(
+              side: BorderSide(width: 2, color: Color(0xFF9747FF)),
+              borderRadius: BorderRadius.circular(15),
+            ),
+          ),
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.attach_money,
+                  color: Colors.black,
+                  size: 25,
+                ),
+              ),
+              Expanded(
+                  child: TextField(
+                controller: priceController,
+                decoration: InputDecoration(
+                  hintText: 'price', // Placeholder text
                   border: InputBorder.none, // Remove input field border
                   contentPadding: EdgeInsets.symmetric(vertical: 14),
                 ),

@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, sort_child_properties_last, deprecated_member_use, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors_in_immutables, file_names, avoid_print
 
+import 'package:covoituragefront/interfaces/pages/checkOfferPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -73,7 +74,14 @@ class _OfferScreenState extends State<OfferScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              // Add functionality for the 'Check' button here
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CheckOffer(
+                    offer: offer,
+                  ),
+                ),
+              );
             },
             child: Text(
               'Check',

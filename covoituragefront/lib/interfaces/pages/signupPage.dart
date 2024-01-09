@@ -56,8 +56,7 @@ class _SignUpState extends State<SignUp> {
   Future<void> registerUser() async {
     if (_emailController.text.isEmpty ||
         _usernameController.text.isEmpty ||
-        _passwordController.text.isEmpty ||
-        _image == null) {
+        _passwordController.text.isEmpty) {
       // Show toast alert for empty fields
       Fluttertoast.showToast(
         msg: 'Please fill in all fields',
